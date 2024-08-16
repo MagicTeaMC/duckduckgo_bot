@@ -13,16 +13,24 @@ client = arc.GatewayClient(bot)
 @arc.slash_command("search", "Search something on DuckDuckGo")
 async def search_command(
     ctx: arc.GatewayContext,
-    question: arc.Option[str, arc.StrParams("The question to search.")]) -> None:  # type: ignore
+    question: arc.Option[str, arc.StrParams("The question to search.")], # type: ignore
+    num_results: arc.Option[int, arc.IntParams("Number of results to display (1-5).")] = 3, # type: ignore
+) -> None:  # type: ignore
+    
+    if num_results < 1:
+        num_results = 1
+    elif num_results > 5:
+        num_results = 5
+        
     asearch = asyncily(ddg_search)
 
     embed = hikari.Embed(
         title=f"Search results for: {question}",
-        description="Here are the top 3 results:",
+        description=f"Here are the top {num_results} results:",
         color=hikari.Color(0x1D4ED8),
     )
 
-    for result in (await asearch(str(question))).web[:3]:
+    for result in (await asearch(str(question))).web[:num_results]:
         SEPARATOR = 5  # Length of " - "
         LENGTH = len(result.url)
 
@@ -42,9 +50,9 @@ async def search_command(
             value=f"{result.description.strip()}",
             inline=False,
         )
-        
-        embed.set_footer(
-            text = "All data are provide by DuckDuckGo and may be wrong"
-        )
+
+    embed.set_footer(
+        text="All data are provided by DuckDuckGo and may be wrong"
+    )
 
     await ctx.respond(embed=embed)
