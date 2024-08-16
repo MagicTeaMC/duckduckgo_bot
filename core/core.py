@@ -10,4 +10,4 @@ client = arc.GatewayClient(bot)
 @arc.slash_command("search", "Search something on DuckDuckGo")
 async def search(ctx: arc.GatewayContext,
     question: arc.Option[str, arc.StrParams("The question to search.")],) -> None:
-    await ctx.respond(await search(question).web[0])
+    await ctx.respond(await search(question))
