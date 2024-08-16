@@ -21,8 +21,13 @@ async def search_command(ctx: arc.GatewayContext,
     )
     
     for result in (await asearch(str(question))).web[:3]:
+        # Ensure the name is 256 characters or fewer
+        name = f"{result.title} - {result.url}"
+        if len(name) > 255:
+            name = f"{result.title[:255 - len(result.url) - 4]}... - {result.url}"
+        
         embed.add_field(
-            name=f"{result.title} - {result.url}",
+            name=name,
             value=f"{result.description.strip()}",
             inline=False
         )
