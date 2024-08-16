@@ -33,5 +33,8 @@ async def search_command(
             value=f"{result.description.strip()[:250]}",
             inline=False,
         )
+        embed.set_footer(
+            text = "All data are provide by DuckDuckGo and may be wrong"
+        )
 
     await ctx.respond(embed=embed)
