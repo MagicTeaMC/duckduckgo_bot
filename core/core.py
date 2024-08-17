@@ -24,10 +24,18 @@ async def search_command(
 ) -> None:
     asearch = asyncily(ddg_search)
 
-    result = await asearch(str(question))
-
+    try:
+        result = await asearch(str(question))
+    except:
+        result = None
+        
     if not result:
-        await ctx.respond("...")
+        embed = hikari.Embed(
+            title=f"Can't find any result",
+            description=":x: No result found",
+            color=hikari.Color(0x1D4ED8),
+        )
+        await ctx.respond(embed=embed)
         return
 
     try:
