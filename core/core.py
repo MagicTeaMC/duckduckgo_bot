@@ -1,3 +1,4 @@
+import html
 import os
 
 import arc
@@ -56,12 +57,12 @@ async def search_command(
             name = name[:256]
 
         embed.add_field(
-            name=name,
-            value=f"{result.description.strip()}",
+            name=html.unescape(name),
+            value=result.description.strip(),
             inline=False,
         )
         if imgresult:
-            embed.set_image(hikari.files.URL(imgresult.url))
+            embed.set_image(hikari.files.URL(imgresult.image))
 
         embed.set_footer(text="All data are provided by DuckDuckGo and may be wrong")
 
