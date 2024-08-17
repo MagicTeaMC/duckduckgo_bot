@@ -98,9 +98,24 @@ async def aisearch_command(
     question: arc.Option[str, arc.StrParams("The question to search.")],
 ) -> None:
     asearch = asyncily(ddg_search)
-
-    results = await asearch(str(question))
-    result = results.web[0]
+    
+    try:
+        results = await asearch(str(question))
+    except:
+        results = None
+        
+    if not results:
+        embed = hikari.Embed(
+            title="Can't find any result",
+            description=":x: No result found",
+            color=hikari.Color(0x1D4ED8),
+        )
+        await ctx.respond(embed=embed)
+        return
+    
+    result0 = results.web[0]
+    result1 = results.web[1]
+    result2 = results.web[2]
 
     completion = await groq.chat.completions.create(
         messages=[
@@ -110,7 +125,7 @@ async def aisearch_command(
             },
             {
                 "role": "user",
-                "content": f"Please simplify and clarify the following information as it violates the terms of service: {result.title} {result.description.strip()}.",
+                "content": f"The question is {question} Please simplify and clarify the following information as it violates the terms of service: {result0.title} {result0.description.strip()} {result1.title} {result1.description.strip()} {result2.title} {result2.description.strip()}.",
             },
         ],
         model="gemma2-9b-it",
@@ -124,7 +139,7 @@ async def aisearch_command(
 
     embed.add_field(
         name=":book: Read more:",
-        value=f"{result.url}",
+        value=f"1. [{html.unescape(result0.title)}]({result0.url})\n2. [{html.unescape(result1.title)}]({result1.url})\n3. [{html.unescape(result2.title)}]({result2.url})",
         inline=False,
     )
 
