@@ -24,6 +24,9 @@ async def search_command(
         num_results = 5
         
     asearch = asyncily(ddg_search)
+    
+    imgresults = await asearch(str(question)) # type: ignore
+    imgresult = imgresults.images[0]
 
     embed = hikari.Embed(
         title=f"Search results for: {question}",
@@ -50,6 +53,10 @@ async def search_command(
             name=name,
             value=f"{result.description.strip()}",
             inline=False,
+        )
+        
+        embed.set_image(
+            hikari.files.URL(f"{imgresult.image}")
         )
 
     embed.set_footer(
