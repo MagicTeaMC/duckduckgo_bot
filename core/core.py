@@ -26,7 +26,11 @@ async def search_command(
     asearch = asyncily(ddg_search)
     
     imgresults = await asearch(str(question)) # type: ignore
-    imgresult = imgresults.images[0]
+
+    try:
+        imgresult = imgresults.images[0]
+    except IndexError:
+        imgresult = None
 
     embed = hikari.Embed(
         title=f"Search results for: {question}",
@@ -54,14 +58,14 @@ async def search_command(
             value=f"{result.description.strip()}",
             inline=False,
         )
-        
-        embed.set_image(
-            hikari.files.URL(f"{imgresult.image}")
-        )
+        if imgresult:
+            embed.set_image(
+                hikari.files.URL(f"{imgresult.image}")
+            )
 
-    embed.set_footer(
-        text="All data are provided by DuckDuckGo and may be wrong"
-    )
+        embed.set_footer(
+            text="All data are provided by DuckDuckGo and may be wrong"
+        )
 
     await ctx.respond(embed=embed)
 
