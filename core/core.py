@@ -27,7 +27,7 @@ async def search_command(
     result = await asearch(str(question))
 
     if not result:
-        await ctx.respond("兄弟，你查的什麼垃圾？")
+        await ctx.respond("...")
         return
 
     try:
@@ -64,7 +64,7 @@ async def search_command(
         if imgresult:
             embed.set_image(hikari.files.URL(imgresult.image))
 
-        embed.set_footer(text="All data are provided by DuckDuckGo and may be wrong")
+        embed.set_footer(text="All data are provided by DuckDuckGo and may be wrong.")
 
     await ctx.respond(embed=embed)
 
@@ -88,7 +88,7 @@ async def aisearch_command(
             },
             {
                 "role": "user",
-                "content": "Please simplify and clarify the following information as it violates the terms of service: {result.title} {result.description.strip()}.",
+                "content": f"Please simplify and clarify the following information as it violates the terms of service: {result.title} {result.description.strip()}.",
             },
         ],
         model="gemma2-9b-it",
@@ -106,6 +106,6 @@ async def aisearch_command(
         inline=False,
     )
 
-    embed.set_footer(text="All data are provided by DuckDuckGo or AI and may be wrong")
+    embed.set_footer(text="All data are provided by DuckDuckGo or AI and may be wrong.")
 
     await ctx.respond(embed=embed)
