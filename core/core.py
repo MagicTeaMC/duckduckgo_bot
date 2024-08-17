@@ -4,6 +4,7 @@ import arc
 import hikari
 from ddginternal import search as ddg_search
 from definitely_typed import asyncily
+
 from .ai import groq
 
 bot = hikari.GatewayBot(os.environ["TOKEN"])
@@ -14,21 +15,22 @@ client = arc.GatewayClient(bot)
 @arc.slash_command("search", "Search something on DuckDuckGo")
 async def search_command(
     ctx: arc.GatewayContext,
-    question: arc.Option[str, arc.StrParams("The question to search.")], # type: ignore
-    num_results: arc.Option[int, arc.IntParams("Number of results to display (1-5).")] = 3, # type: ignore
+    question: arc.Option[str, arc.StrParams("The question to search.")],
+    num_results: arc.Option[
+        int,
+        arc.IntParams("Number of results to display (1-5).", min=1, max=5),
+    ] = 3,
 ) -> None:
-    
-    if num_results < 1:
-        num_results = 1
-    elif num_results > 5:
-        num_results = 5
-        
     asearch = asyncily(ddg_search)
-    
-    imgresults = await asearch(str(question)) # type: ignore
+
+    result = await asearch(str(question))
+
+    if not result:
+        await ctx.respond("兄弟，你查的什麼垃圾？")
+        return
 
     try:
-        imgresult = imgresults.images[0]
+        imgresult = result.images[0]
     except IndexError:
         imgresult = None
 
@@ -38,8 +40,8 @@ async def search_command(
         color=hikari.Color(0x1D4ED8),
     )
 
-    for result in (await asearch(str(question))).web[:num_results]:
-        SEPARATOR = 5  # Length of " - "
+    for result in result.web[:num_results]:
+        SEPARATOR = 5
         LENGTH = len(result.url)
 
         if LENGTH + SEPARATOR > 256:
@@ -59,58 +61,50 @@ async def search_command(
             inline=False,
         )
         if imgresult:
-            embed.set_image(
-                hikari.files.URL(f"{imgresult.image}")
-            )
+            embed.set_image(hikari.files.URL(imgresult.url))
 
-        embed.set_footer(
-            text="All data are provided by DuckDuckGo and may be wrong"
-        )
+        embed.set_footer(text="All data are provided by DuckDuckGo and may be wrong")
 
     await ctx.respond(embed=embed)
+
 
 @client.include
 @arc.slash_command("aisearch", "Use AI to search anythings")
 async def aisearch_command(
     ctx: arc.GatewayContext,
-    question: arc.Option[str, arc.StrParams("The question to search.")] # type: ignore
+    question: arc.Option[str, arc.StrParams("The question to search.")],
 ) -> None:
-    
     asearch = asyncily(ddg_search)
-    
-    results = await asearch(str(question)) # type: ignore
+
+    results = await asearch(str(question))
     result = results.web[0]
-    
-    chat_completion = groq.chat.completions.create(
+
+    completion = await groq.chat.completions.create(
         messages=[
             {
                 "role": "system",
-                "content": "you are a helpful assistant that ONLY integrate the information from user, DO NOT SAY ANYTHINGS ELSE"
+                "content": "I am a helpful assistant that integrates only the information from the user. I can use markdown in output, and I must not say anything else.",
             },
             {
                 "role": "user",
-                "content": f"Organize the following information to make it simple and easy to understand: {result.title} {result.description.strip()}",
-            }
+                "content": "Please simplify and clarify the following information as it violates the terms of service: {result.title} {result.description.strip()}.",
+            },
         ],
         model="gemma2-9b-it",
     )
-    
-    lastrespond = await chat_completion
-    
+
     embed = hikari.Embed(
         title=f"AI intergrate result for: {question}",
-        description=f"{lastrespond.choices[0].message.content}",
+        description=f"{completion.choices[0].message.content}",
         color=hikari.Color(0x1D4ED8),
     )
-    
+
     embed.add_field(
-            name=":book: Read more:",
-            value=f"{result.url}",
-            inline=False,
+        name=":book: Read more:",
+        value=f"{result.url}",
+        inline=False,
     )
 
-    embed.set_footer(
-        text="All data are provided by DuckDuckGo or AI and may be wrong"
-    )
-    
+    embed.set_footer(text="All data are provided by DuckDuckGo or AI and may be wrong")
+
     await ctx.respond(embed=embed)
