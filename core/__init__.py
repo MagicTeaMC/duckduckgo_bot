@@ -12,9 +12,21 @@ from core.ai import (
 )
 from core.core import (
     aisearch_command,
+    arc_client,
+    asearch,
     bot,
     client,
     search_command,
 )
 
-__all__ = ["ai", "aisearch_command", "bot", "client", "core", "groq", "search_command"]
+__all__ = [
+    "ai",
+    "aisearch_command",
+    "arc_client",
+    "asearch",
+    "bot",
+    "client",
+    "core",
+    "groq",
+    "search_command",
+]
