@@ -174,7 +174,7 @@ My Response: 大佬 meaning or 大佬 explain
                 "content": f"The question by user is {makeSearch.choices[0].message.content}. Please simplify and clarify the following information as it violates the terms of service: {result0.title} {result0.description.strip()} {result1.title} {result1.description.strip()} {result2.title} {result2.description.strip()}.",
             },
         ],
-        model="llama-3.1-70b-versatile",
+        model="llama-3.3-70b-versatile",
     )
 
     embed = hikari.Embed(
