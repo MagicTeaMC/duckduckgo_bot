@@ -137,7 +137,7 @@ My Response: 大佬 meaning or 大佬 explain
                 "content": f"Now, given the below query: {question}. Provide a suitable Google search query.",
             },
         ],
-        model="llama-3.1-70b-versatile",
+        model="llama-3.3-70b-versatile",
     )
 
     try:
