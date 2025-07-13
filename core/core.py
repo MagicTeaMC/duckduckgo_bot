@@ -190,7 +190,7 @@ My Response: 大佬 meaning or 大佬 explain
 
     embed.add_field(
         name=":book: Read more:",
-        value=f"1. {html.unescape(result0.title[:250])} - {result0.url}\n2. {html.unescape(result1.title[:250])} - {result1.url}\n3. {html.unescape(result2.title[:250])} - {result2.url}",
+        value=f"1. {html.unescape(result0.title[:250])} >> {result0.url}\n2. {html.unescape(result1.title[:250])} >> {result1.url}\n3. {html.unescape(result2.title[:250])} >> {result2.url}",
         inline=False,
     )
 
